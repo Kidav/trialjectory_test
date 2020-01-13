@@ -1,1 +1,3 @@
-# trialjectory_test
+# trialjectory test
+
+Proposed schema for mysql database
