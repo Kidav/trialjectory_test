@@ -3,7 +3,7 @@
 -- Server version:               8.0.12 - MySQL Community Server - GPL
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2020-01-13 23:03:51
+-- Date/time:                    2020-01-16 12:18:08
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -61,7 +61,9 @@ CREATE TABLE IF NOT EXISTS `model_property_path` (
   `name` varchar(1000) NOT NULL COMMENT 'Description of path',
   `path` varchar(1000) NOT NULL COMMENT 'Path to models field , can has two models in case hasMany relation (profile.profileBiomarker.biomarkerId)',
   `source_model_id` int(11) DEFAULT NULL COMMENT 'Describe lookup values for property',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_model_property_path_r_source_model` (`source_model_id`),
+  CONSTRAINT `fk_model_property_path_r_source_model` FOREIGN KEY (`source_model_id`) REFERENCES `source_model` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
@@ -130,13 +132,10 @@ CREATE TABLE IF NOT EXISTS `questionare` (
   `is_mandatory` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'for value "1" no need to check cancer of patient',
   `question` varchar(1000) NOT NULL,
   `controll` enum('date','text','radio','checkbox') NOT NULL COMMENT 'Name of component on frontend side',
-  `source_model_id` int(11) DEFAULT NULL COMMENT 'Name of sequilize model to findAll available options',
   `model_property_path_id` int(11) NOT NULL COMMENT 'Model.Model.Field notation. For example  profile.profile_biomarker.biomarker_id',
   PRIMARY KEY (`id`),
   KEY `fk_questionare_r_save_path` (`model_property_path_id`),
-  KEY `fk_questionare_r_source_model` (`source_model_id`),
-  CONSTRAINT `fk_questionare_r_save_path` FOREIGN KEY (`model_property_path_id`) REFERENCES `model_property_path` (`id`),
-  CONSTRAINT `fk_questionare_r_source_model` FOREIGN KEY (`source_model_id`) REFERENCES `source_model` (`id`)
+  CONSTRAINT `fk_questionare_r_save_path` FOREIGN KEY (`model_property_path_id`) REFERENCES `model_property_path` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
@@ -187,6 +186,38 @@ CREATE TABLE IF NOT EXISTS `trial` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table trialjectory.trial_allow_biomarker
+DROP TABLE IF EXISTS `trial_allow_biomarker`;
+CREATE TABLE IF NOT EXISTS `trial_allow_biomarker` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `trial_id` int(11) NOT NULL,
+  `biomarker_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_trial_allow_desease_stage_r_trial` (`trial_id`),
+  KEY `fk_trial_allow_desease_stage_r_biomarker` (`biomarker_id`),
+  CONSTRAINT `fk_trial_allow_desease_biomarker_r_biomarker` FOREIGN KEY (`biomarker_id`) REFERENCES `biomarker` (`id`),
+  CONSTRAINT `fk_trial_allow_desease_biomarker_r_trial` FOREIGN KEY (`trial_id`) REFERENCES `trial` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table trialjectory.trial_allow_desease_stage
+DROP TABLE IF EXISTS `trial_allow_desease_stage`;
+CREATE TABLE IF NOT EXISTS `trial_allow_desease_stage` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `trial_id` int(11) NOT NULL,
+  `desease_stage_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_trial_allow_desease_stage_r_trial` (`trial_id`),
+  KEY `fk_trial_allow_desease_stage_r_desease_stage` (`desease_stage_id`),
+  CONSTRAINT `fk_trial_allow_desease_stage_r_stage` FOREIGN KEY (`desease_stage_id`) REFERENCES `desease_stage` (`id`),
+  CONSTRAINT `fk_trial_allow_desease_stage_r_trial` FOREIGN KEY (`trial_id`) REFERENCES `trial` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
